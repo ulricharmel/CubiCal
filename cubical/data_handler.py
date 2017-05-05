@@ -48,7 +48,7 @@ def _parse_range(arg, nmax):
 
 ## TERMINOLOGY:
 ## A "chunk" is data for one DDID, a range of timeslots (thus, a subset of the MS rows), and a slice of channels.
-## Chunks are the basic parallelization unit. Solver deal with a chunk of data.
+## Chunks are the basic parallelization unit. Solvers deal with a chunk of data.
 ##
 ## A "row chunk" is data for one DDID, a range of timeslots, and *all* channels. One can imagine a row chunk
 ## as a "horizontal" vector of chunks across frequency.

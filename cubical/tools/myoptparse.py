@@ -73,8 +73,14 @@ class MyOptParse():
         metavar = attrs.get('options') or attrs.get('metavar', None)
         action = None
         if opttype is bool:
-            opttype = str
+            opttype = "choice"
             metavar = "0|1"
+            choices = "0", "1", "False", "True"
+        else:
+            choices = attrs.get('options')
+            if choices:
+                choices = choices.split("|")
+                opttype = "choice"
         # handle doc string
         if 'doc' in attrs:
             help = attrs['doc']
@@ -93,6 +99,7 @@ class MyOptParse():
 
         self.CurrentGroup.add_option(*option_names,
             help=help, type=opttype, default=default, metavar=metavar, action=action,
+            choices=choices,
             dest=self.GiveKeyDest(self.CurrentGroupKey,name))
 
     def GiveKeyDest(self,GroupKey,Name):

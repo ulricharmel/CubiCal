@@ -163,13 +163,16 @@ def main(debugging=False):
         ms.define_chunk(GD["data"]["time-chunk"], GD["data"]["freq-chunk"],
                         min_chunks_per_tile=max(GD["dist"]["ncpu"], GD["dist"]["min-chunks"]))
 
-        saving_data = True
         if GD["out"]["vis"] == "corrected":
             solver_type = 'solve-correct'
-        elif GD["out"]["vis"] == "residuals":
+        elif GD["out"]["vis"] in ("residuals", "residual"):
             solver_type = 'solve-residual'
+        elif GD["out"]["vis"]:
+            raise ValueError("unknown solver type '{}'".format(GD["out"]["vis"]))
         else:
             solver_type = 'solve'
+        print>>log,ModColor.Str("setting 'out-vis {}': solver type '{}'".format(
+                                GD["out"]["vis"], solver_type), col="green")
 
         solver_opts = GD["sol"]
 
