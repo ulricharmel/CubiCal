@@ -200,6 +200,7 @@ def main(debugging=False):
                 for key in tile.get_chunk_keys():
                     if not single_chunk or tile.get_chunk_label(key) == single_chunk:
                         stats_dict[key] = solver.run_solver(solver_type, itile, key, solver_opts)
+
                 tile.save()
                     # ms.add_to_gain_dict(outdict['gains'], chunk_info,
                     #                     GD["sol"]["time-int"], GD["sol"]["freq-int"])

@@ -40,7 +40,7 @@ def retile_array(in_arr, m1, m2, n1, n2):
 
 
 
-def _solve_gains(obser_arr, model_arr, flags_arr, options, label="", compute_residuals=None):
+def solve_gains(obser_arr, model_arr, flags_arr, options, label="", compute_residuals=None):
     """
     This function is the main body of the GN/LM method. It handles iterations
     and convergence tests.
@@ -52,7 +52,6 @@ def _solve_gains(obser_arr, model_arr, flags_arr, options, label="", compute_res
 
         options: dict of various solver options (see [solution] section in DefaultParset.cfg)
 
-        chunk_key:         tuple of (n_time_chunk, n_freq_chunk) identifying current chunk
         label:             string label identifying current chunk (e.d. "D0T1F2")
 
         compute_residuals: if set, final residuals will be computed and returned
@@ -352,7 +351,7 @@ def _solve_gains(obser_arr, model_arr, flags_arr, options, label="", compute_res
 
             n_stall = float(np.sum(((old_chi - chi) < chi_tol*old_chi)))
 
-            if log.verbosity() > 1:
+            if log.verbosity() > 1:axis
 
                 delta_chi = (old_mean_chi-mean_chi)/old_mean_chi
 
@@ -433,7 +432,7 @@ def solve_only(obser_arr, model_arr, flags_arr, weight_arr, tile, key, label, op
         obser_arr *= weight_arr[..., np.newaxis, np.newaxis]
         model_arr *= weight_arr[np.newaxis, ..., np.newaxis, np.newaxis]
 
-    gm, _, stats = _solve_gains(obser_arr, model_arr, flags_arr, options, label=label)
+    gm, _, stats = solve_gains(obser_arr, model_arr, flags_arr, options, label=label)
 
     return gm, None, stats
 
@@ -447,7 +446,7 @@ def solve_and_correct(obser_arr, model_arr, flags_arr, weight_arr, tile, key, la
     else:
         obser_arr1 = obser_arr
 
-    gm, _, stats = _solve_gains(obser_arr1, model_arr, flags_arr, options, label=label)
+    gm, _, stats = solve_gains(obser_arr1, model_arr, flags_arr, options, label=label)
 
     # for corrected visibilities, take the first data/model pair only
     corr_vis = np.zeros_like(obser_arr[0,...])
@@ -468,7 +467,7 @@ def solve_and_correct_res(obser_arr, model_arr, flags_arr, weight_arr, tile, key
 
     # use the residuals computed in solve_gains() only if no weights. Otherwise need
     # to recompute them from unweighted versions
-    gm, resid_vis, stats = _solve_gains(obser_arr1, model_arr1, flags_arr, options, label=label,
+    gm, resid_vis, stats = solve_gains(obser_arr1, model_arr1, flags_arr, options, label=label,
                                         compute_residuals=(weight_arr is None))
 
     # if we reweighted things above, then recompute the residuals, else use returned residuals
@@ -511,7 +510,7 @@ def run_solver(solver_type, itile, chunk_key, options):
 
         tile.set_chunk_gains(gm.gains, chunk_key)
 
-        return stats
+        return stats, gm.gains
     except Exception, exc:
         print>>log,ModColor.Str("Solver for tile {} chunk {} failed with exception: {}".format(itile, label, exc))
         print>>log,traceback.format_exc()
