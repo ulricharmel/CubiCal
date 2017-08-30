@@ -33,7 +33,7 @@ def make_summary_plots(st, GD, basename):
     # plot noise per time/channel
     pylab.subplot(121)
     pylab.title("Noise on input data")
-    pylab.xlabel("channel")
+    pylab.xlabel("Channel")
     pylab.ylabel("timeslot")
     st.timechan.dv2[st.timechan.dv2 == 0] = np.inf
     pylab.imshow(np.sqrt(st.timechan.dv2))
