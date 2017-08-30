@@ -230,7 +230,8 @@ def main(debugging=False):
 
         print>>log, "defining chunks"
         ms.define_chunk(GD["data"]["time-chunk"], GD["data"]["freq-chunk"],
-                        min_chunks_per_tile=max(GD["dist"]["ncpu"], GD["dist"]["min-chunks"]))
+                        min_chunks_per_tile=max(GD["dist"]["ncpu"], GD["dist"]["min-chunks"]), 
+                        chunk_on=GD["data"]["chunk-on-col"])
 
         t0 = time()
 

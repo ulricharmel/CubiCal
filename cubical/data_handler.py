@@ -855,7 +855,7 @@ class ReadModelHandler:
 
         return self.data.getcol(*args, **kwargs)
 
-    def define_chunk(self, tdim=1, fdim=1, chunk_by_scan=True, min_chunks_per_tile=4):
+    def define_chunk(self, tdim=1, fdim=1, chunk_by_scan=True, min_chunks_per_tile=4, chunk_on="SCAN_NUMBER"):
         """
         Fetches indexing columns (TIME, DDID, ANTENNA1/2) and defines the chunk dimensions for the data.
 
@@ -906,7 +906,7 @@ class ReadModelHandler:
         # simply break up all timeslots
 
         if chunk_by_scan:
-            scan_chunks = self.check_contig()
+            scan_chunks = self.check_contig(chunk_on)
             timechunks = []
             for scan_num in xrange(len(scan_chunks) - 1):
                 timechunks.extend(range(scan_chunks[scan_num], scan_chunks[scan_num+1], self.chunk_tdim))
@@ -987,9 +987,9 @@ class ReadModelHandler:
 
         print>> log, "  coarsening this to {} tiles (min {} chunks per tile)".format(len(Tile.tile_list), min_chunks_per_tile)
 
-    def check_contig(self):
+    def check_contig(self, chunk_on):
 
-        scan = self.fetch("SCAN_NUMBER")
+        scan = self.fetch(chunk_on)
 
         if np.all(scan==scan[0]):
             scan_t = [0, self.ntime]
