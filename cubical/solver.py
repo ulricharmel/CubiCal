@@ -841,6 +841,70 @@ class CorrectResiduals(SubtractOnly):
     def outputs_full_corrected_residuals(self):
         return self.sol_opts['subtract-dirs'] == slice(None)
 
+class SolveFullrest(SolveOnly):
+    """Run the solver, generate fullrest residuals by iteractively subtracting and correcting in every direction,
+        then compute the fullrest map by summing over all the directions        
+    """
+
+    def run(self):
+        SolveOnly.run(self)
+
+        n_dir = self.vdm.model_arr.shape[0]
+
+        init_corrected = False 
+
+        # iteratively computed and accumulated the corrected data
+        for direction in range(n_dir):
+            directions = list(range(n_dir))
+            subtract_dirs = directions.remove(direction)
+            resid_vis = self.vdm.corrupt_residual(self.sol_opts["subtract-model"],  subtract_dirs)
+            corr_vis = np.zeros_like(resid_vis)
+            self.gm.apply_inv_gains(resid_vis, corr_vis, full2x2=True, direction=direction)
+
+            if init_corrected:
+                fullrest += corr_vis
+            else:
+                init_corrected = True
+                fullrest = np.copy(corr_vis)
+
+        return fullrest[0,...]
+
+
+class ApplyFullrest(SolverMachine):
+    """Run the solver, generate fullrest residuals by iteractively subtracting and correcting in every direction,
+        then compute the fullrest map by summing over all the directions        
+    """
+
+    # mark machine as an apply-only type
+    is_apply_only = True
+
+    def run(self):
+        # SolveOnly.run(self)
+        # doing it before recomputing the residuals: saves time
+        if ifrgain_machine.is_computing():
+            ifrgain_machine.update(self.vdm.weighted_obser, self.vdm.corrupt_weighted_model, self.vdm.flags_arr,
+                                   self.vdm.freq_slice, self.soldict)
+
+        n_dir = self.vdm.model_arr.shape[0]
+
+        init_corrected = False 
+
+        # iteratively computed and accumulated the corrected data
+        for direction in range(n_dir):
+            directions = list(range(n_dir))
+            subtract_dirs = directions.remove(direction)
+            resid_vis = self.vdm.corrupt_residual(self.sol_opts["subtract-model"],  subtract_dirs)
+            corr_vis = np.zeros_like(resid_vis)
+            self.gm.apply_inv_gains(resid_vis, corr_vis, full2x2=True, direction=direction)
+
+            if init_corrected:
+                fullrest += corr_vis
+            else:
+                init_corrected = True
+                fullrest = np.copy(corr_vis)
+
+        return fullrest[0,...]
+
 
 SOLVERS = { 'so': SolveOnly,
             'sc': SolveAndCorrect,
@@ -848,7 +912,9 @@ SOLVERS = { 'so': SolveOnly,
             'ss': SolveAndSubtract,
             'ac': CorrectOnly,
             'ar': CorrectResiduals,
-            'as': SubtractOnly
+            'as': SubtractOnly,
+            'sf': SolveFullrest,
+            'af':ApplyFullrest
             }
 
 #@profile
