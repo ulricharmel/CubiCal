@@ -867,7 +867,7 @@ class SolveFullrest(SolveOnly):
                 init_corrected = True
                 fullrest = np.copy(corr_vis)
 
-        return fullrest[0,...]
+        return fullrest
 
 
 class ApplyFullrest(SolverMachine):
@@ -903,7 +903,7 @@ class ApplyFullrest(SolverMachine):
                 init_corrected = True
                 fullrest = np.copy(corr_vis)
 
-        return fullrest[0,...]
+        return fullrest
 
 
 SOLVERS = { 'so': SolveOnly,
