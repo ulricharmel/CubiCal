@@ -855,8 +855,8 @@ class SolveFullrest(SolveOnly):
 
         # iteratively computed and accumulated the corrected data
         for direction in range(n_dir):
-            directions = list(range(n_dir))
-            subtract_dirs = directions.remove(direction)
+            subtract_dirs = list(range(n_dir))
+            subtract_dirs.remove(direction)
             resid_vis = self.vdm.corrupt_residual(self.sol_opts["subtract-model"],  subtract_dirs)
             corr_vis = np.zeros_like(resid_vis)
             self.gm.apply_inv_gains(resid_vis, corr_vis, full2x2=True, direction=direction)
@@ -891,8 +891,8 @@ class ApplyFullrest(SolverMachine):
 
         # iteratively computed and accumulated the corrected data
         for direction in range(n_dir):
-            directions = list(range(n_dir))
-            subtract_dirs = directions.remove(direction)
+            subtract_dirs = list(range(n_dir))
+            subtract_dirs.remove(direction)
             resid_vis = self.vdm.corrupt_residual(self.sol_opts["subtract-model"],  subtract_dirs)
             corr_vis = np.zeros_like(resid_vis)
             self.gm.apply_inv_gains(resid_vis, corr_vis, full2x2=True, direction=direction)
